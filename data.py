@@ -1,9 +1,8 @@
-#import packages
 import pandas as pd
 import numpy as np
 
 #Grabber function to simplify dataset loading in notebook
-def grab_dataset(dataset, timeframe):
+def grab_dataset(dataset, timeframe='monthly'):
     
     #check for available datasets and timeframe
     if dataset not in ['global_temp', 'electricity', 'co2', 'ch4']:
@@ -35,6 +34,9 @@ def grab_dataset(dataset, timeframe):
             elec_raw['YYYYMM'] = elec_raw['YYYYMM'].astype("string")
             elec_raw['month'] = elec_raw['YYYYMM'].str[-2:]
             elec_raw['year'] = elec_raw['YYYYMM'].str[:4]
+
+            #ensure that electricity generation value is numeric
+            # elec_raw['Value'] = elec_raw['Value'].astype('float')
             
             #month replacement for dataset uniformity
             month_rep = {'01': 'Jan',
@@ -49,11 +51,18 @@ def grab_dataset(dataset, timeframe):
                         '10': 'Oct',
                         '11': 'Nov',
                         '12': 'Dec',}
-            elec_raw['month'] = elec_raw['month'].replace(month_rep)
+            # elec_raw['month'] = elec_raw['month'].replace(month_rep)
 
-            elec = elec_raw[['year', 'month', 'Value']]
-            elec = elec.rename(columns = {'Value': 'elec_generation'})
-            elec = elec.reset_index(drop = True)
+            elec = (elec_raw[['year', 'month', 'Value']]
+                    .replace({'month': month_rep})
+                    .rename(columns = {'Value': 'elec_generation'})
+                    .reset_index(drop = True)
+                    .astype({'elec_generation': 'float', 'year': 'int'})
+                    )
+            
+            # Drop rows where month==13, which are the yearly totals.
+            elec = elec[elec['month'] != '13']
+
             return elec
             
         #co2 data grabber    
@@ -76,7 +85,7 @@ def grab_dataset(dataset, timeframe):
             co2_raw['month'] = co2_raw['month'].replace(month_rep)
             
             co2 = co2_raw[['year', 'month', 'average']]
-            co2 = co2.rename(columns = {'average': 'average_co2'})
+            co2 = co2.rename(columns = {'average': 'co2_average'})
             return co2
         
         #methane data grabber
@@ -98,7 +107,7 @@ def grab_dataset(dataset, timeframe):
             ch4_raw['month'] = ch4_raw['month'].replace(month_rep)
             
             ch4 = ch4_raw[['year', 'month', 'average']]
-            ch4 = ch4.rename(columns = {'average': 'average_ch4'})
+            ch4 = ch4.rename(columns = {'average': 'ch4_average'})
             return ch4
         
         
