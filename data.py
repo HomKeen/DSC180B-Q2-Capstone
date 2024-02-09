@@ -1,3 +1,7 @@
+'''
+Contains methods that grab and clean datasets for analysis.
+'''
+
 import pandas as pd
 import numpy as np
 
