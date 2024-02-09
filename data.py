@@ -17,9 +17,27 @@ def grab_dataset(dataset, timeframe='monthly'):
         if dataset == 'global_temp':
             months_abv = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            month_rep = {'Jan': 1,
+                        'Feb': 2,
+                        'Mar': 3,
+                        'Apr': 4,
+                        'May': 5,
+                        'Jun': 6,
+                        'Jul': 7,
+                        'Aug': 8,
+                        'Sep': 9,
+                        'Oct': 10,
+                        'Nov': 11,
+                        'Dec': 12}
             global_temp_raw = pd.read_csv('data/global-temp-monthly.csv')
-            global_temp = pd.melt(global_temp_raw, id_vars=['Year'], value_vars=months_abv)
-            global_temp = global_temp.rename(columns={'Year': 'year', 'variable': 'month', 'value': 'temp_change'})
+            global_temp = pd.melt(global_temp_raw, id_vars=['Year'], value_vars=months_abv) \
+                            .rename(columns={'Year': 'year', 'variable': 'month', 'value': 'temp_change'})
+            global_temp = (global_temp
+                            .assign(month_code=global_temp['month'].apply(lambda m: month_rep[m]))
+                            .sort_values(by=['year', 'month_code'])
+                            .drop(columns=['month_code'])
+                            .reset_index(drop=True)
+                           )
             return global_temp
         
         #electricity generation data grabber
