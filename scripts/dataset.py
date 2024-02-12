@@ -37,8 +37,19 @@ class EarthSystemsDataset(Dataset):
         self.mode = mode
         self.lags = lags
 
+        '''
+        self.data is thte current working dataset. It can be a training set (self.train_data),
+        or a validation set (self.val_data). We can also select all possible data (self.full_data),
+        if we want to find the error over the entire dataset.
+
+        It will select full data by default.
+        '''
+
+
         raw_datasets = [grab_dataset(var_name, timeframe=timeframe) for var_name in data_var_names]
-        self.data = EarthSystemsDataset.trim_data(raw_datasets) 
+        self.full_data = EarthSystemsDataset.trim_data(raw_datasets) 
+
+        self.data = self.full_data
 
         if val_frac:
             train_stop = int((1-val_frac) * self.data.shape[0])
@@ -50,8 +61,7 @@ class EarthSystemsDataset(Dataset):
 
         self.data = self.train_data
 
-
-
+        
 
 
     def __len__(self):
@@ -81,6 +91,10 @@ class EarthSystemsDataset(Dataset):
     def val_mode(self):
         # Prepares the dataset for validation
         self.data = self.val_data
+
+    def full_mode(self):
+        # Uses all of the data (in self.data)
+        self.data = self.full_data
         
     @staticmethod
     def trim_data(all_data):

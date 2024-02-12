@@ -33,7 +33,7 @@ def grab_dataset(dataset, timeframe='monthly'):
                         'Oct': 10,
                         'Nov': 11,
                         'Dec': 12}
-            global_temp_raw = pd.read_csv('data/global-temp-monthly.csv')
+            global_temp_raw = pd.read_csv('../data/global-temp-monthly.csv')
             global_temp = pd.melt(global_temp_raw, id_vars=['Year'], value_vars=months_abv) \
                             .rename(columns={'Year': 'year', 'variable': 'month', 'value': 'temp_change'})
             global_temp = (global_temp
@@ -46,7 +46,7 @@ def grab_dataset(dataset, timeframe='monthly'):
         
         #electricity generation data grabber
         if dataset == 'electricity':
-            elec_raw = pd.read_csv('data/electricity-overview-monthly.csv')
+            elec_raw = pd.read_csv('../data/electricity-overview-monthly.csv')
             
             #grab electricity net generation across all sectors
             elec_raw = elec_raw[elec_raw['Description'] == 'Electricity Net Generation, Total']
@@ -89,7 +89,7 @@ def grab_dataset(dataset, timeframe='monthly'):
             
         #co2 data grabber    
         if dataset == 'co2':
-            co2_raw = pd.read_csv('data/co2-monthly.csv', comment = '#')
+            co2_raw = pd.read_csv('../data/co2-monthly.csv', comment = '#')
             
             #month replacement for dataset uniformity
             month_rep = {1: 'Jan',
@@ -112,7 +112,7 @@ def grab_dataset(dataset, timeframe='monthly'):
         
         #methane data grabber
         if dataset == 'ch4':
-            ch4_raw = pd.read_csv('data/ch4-monthly.csv', comment = '#')
+            ch4_raw = pd.read_csv('../data/ch4-monthly.csv', comment = '#')
             
             month_rep = {1: 'Jan',
                         2: 'Feb',

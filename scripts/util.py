@@ -1,3 +1,7 @@
+'''
+General purpose functions, for use wherever we need them.
+'''
+
 import time
 
 class Timer:
