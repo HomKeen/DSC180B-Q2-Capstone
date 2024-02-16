@@ -9,7 +9,7 @@ import numpy as np
 def grab_dataset(dataset, timeframe='monthly'):
     
     #check for available datasets and timeframe
-    if dataset not in ['global_temp', 'electricity', 'co2', 'ch4']:
+    if dataset not in ['global_temp', 'elec_fossil', 'elec_clean', 'co2', 'ch4']:
         raise ValueError("not a valid dataset")
     if timeframe not in ['yearly', 'monthly']:
         raise ValueError("not a valid timeframe")
@@ -44,12 +44,16 @@ def grab_dataset(dataset, timeframe='monthly'):
                            )
             return global_temp
         
-        #electricity generation data grabber
-        if dataset == 'electricity':
-            elec_raw = pd.read_csv('../data/electricity-overview-monthly.csv')
+        #fossil fuel electricity generation data grabber
+        if dataset == 'elec_fossil' or dataset == 'elec_clean':
+            
+            sector = ('Total Renewable Energy Production' if dataset == 'elec_clean' 
+                      else 'Total Fossil Fuels Production')
+
+            elec_raw = pd.read_csv('../data/electricity-monthly.csv')
             
             #grab electricity net generation across all sectors
-            elec_raw = elec_raw[elec_raw['Description'] == 'Electricity Net Generation, Total']
+            elec_raw = elec_raw[elec_raw['Description'] == sector]
             
             #all previous years are yearly averages
             elec_raw = elec_raw[elec_raw['YYYYMM'] >= 197301]
@@ -77,9 +81,9 @@ def grab_dataset(dataset, timeframe='monthly'):
 
             elec = (elec_raw[['year', 'month', 'Value']]
                     .replace({'month': month_rep})
-                    .rename(columns = {'Value': 'elec_generation'})
+                    .rename(columns = {'Value': dataset})
                     .reset_index(drop = True)
-                    .astype({'elec_generation': 'float', 'year': 'int'})
+                    .astype({dataset: 'float', 'year': 'int'})
                     )
             
             # Drop rows where month==13, which are the yearly totals.
