@@ -28,14 +28,15 @@ class EarthSystemsDataset(Dataset):
         '''
         assert mode in ('rnn', 'ann'), \
             f'ERROR: {mode} is not a valid value for `mode`. It should be either "rnn" or "ann"'
-        assert isinstance(val_frac, float) and 0 <= val_frac < 1, \
+        assert (isinstance(val_frac, float) and 0 <= val_frac < 1) or val_frac is None, \
             f'ERROR {val_frac} is not a valid value for `val_frac`. It should be between 0 and 1'
 
         self.data_var_names = data_var_names
         self.y_vals = y_vals
         self.val_frac = val_frac
-        self.mode = mode
         self.lags = lags
+        self.mode = mode
+        
 
         '''
         self.data is thte current working dataset. It can be a training set (self.train_data),
@@ -95,6 +96,14 @@ class EarthSystemsDataset(Dataset):
     def full_mode(self):
         # Uses all of the data (in self.data)
         self.data = self.full_data
+
+    def split(self, train_ind, val_ind):
+        '''
+        Manually choose validation and training data using a year/month index
+        '''
+
+        self.train_data = self.full_data.loc[train_ind]
+        self.val_data = self.full_data.loc[val_ind]
         
     @staticmethod
     def trim_data(all_data):

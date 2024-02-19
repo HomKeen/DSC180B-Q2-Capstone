@@ -9,7 +9,7 @@ import numpy as np
 def grab_dataset(dataset, timeframe='monthly'):
     
     #check for available datasets and timeframe
-    if dataset not in ['global_temp', 'elec_fossil', 'elec_clean', 'co2', 'ch4']:
+    if dataset not in ['global_temp', 'elec_fossil', 'elec_clean', 'co2', 'ch4', 'petroleum']:
         raise ValueError("not a valid dataset")
     if timeframe not in ['yearly', 'monthly']:
         raise ValueError("not a valid timeframe")
@@ -57,7 +57,7 @@ def grab_dataset(dataset, timeframe='monthly'):
             
             #all previous years are yearly averages
             elec_raw = elec_raw[elec_raw['YYYYMM'] >= 197301]
-            elec_raw['YYYYMM'] = elec_raw['YYYYMM'].astype("string")
+            elec_raw['YYYYMM'] = elec_raw['YYYYMM'].astype('str')
             elec_raw['month'] = elec_raw['YYYYMM'].str[-2:]
             elec_raw['year'] = elec_raw['YYYYMM'].str[:4]
 
@@ -135,6 +135,21 @@ def grab_dataset(dataset, timeframe='monthly'):
             ch4 = ch4_raw[['year', 'month', 'average']]
             ch4 = ch4.rename(columns = {'average': 'ch4_average'})
             return ch4
+        
+        #petroleum data grabber
+        if dataset == 'petroleum':
+            petrol_monthly = pd.read_csv('../data/petroleum-monthly.csv').iloc[4, 2:]
+            times = petrol_monthly.index.str.split()
+
+            petrol_monthly = (
+                petrol_monthly
+                .to_frame(name='petroleum')
+                .set_index(pd.MultiIndex.from_arrays([times.str[0], times.str[1]], names=('month', 'year')))
+                .reset_index()
+                .astype({'year': 'int64', 'petroleum': 'float'})
+                )
+            return petrol_monthly
+
         
         
     #yearly data grab (UNFINISHED)
