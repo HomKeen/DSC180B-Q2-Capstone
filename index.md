@@ -1,7 +1,8 @@
 # Causal Analysis of Instantaneous and Time-Delayed Relations in the Earth System
+
 Authors Keenan Hom, Dean Carrion, Nithilan Muruganandham, Arnav Khanna
----
 Mentors: Biwei Huang, Babak Salimi
+---
 
 ### Introduction
 ### Data
