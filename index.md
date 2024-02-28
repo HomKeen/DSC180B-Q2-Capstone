@@ -7,7 +7,7 @@ Mentors: Biwei Huang, Babak Salimi
 ---
 
 ### Introduction
-### Data
+### Data Sources
 * Global Temperature: Goddard Institute for Space Studies (GISS) / NASA
 * CO2 & Methane (CH4): Global Monitoring Division of the National Oceanic and Atmospheric Administration (NOAA)
 * Electricity Generation (Fossil Fuels/Clean) & Petroleum Production: Energy Information Administration (EIA)
@@ -23,6 +23,7 @@ Mentors: Biwei Huang, Babak Salimi
 
 ### Combined Time-Delayed and Instantaneous Causal Relations
 ### Results
+### References
 #### Contact Info
 Keenan Hom: kwhom@ucsd.edu
 <br>
