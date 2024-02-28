@@ -14,3 +14,14 @@ Mentors: Biwei Huang, Babak Salimi
 ### Combined Time-Delayed and Instantaneous Causal Relations
 ### Results
 #### Contact Info
+Keenan Hom: kwhom@ucsd.edu
+<br>
+Dean Carrion: dcarrion@ucsd.edu
+<br>
+Nithilan Muruganandham: nmuruganandham@ucsd.edu
+<br>
+Arnav Khanna: arkhanna@ucsd.edu
+<br>
+Biwei Huang: bih007@ucsd.edu
+<br>
+Babak Salimi: bsalimi@ucsd.edu
