@@ -8,9 +8,15 @@ Mentors: Biwei Huang, Babak Salimi
 
 ### Introduction
 ### Data
+<iframe src="assets/datavis.png" width=800 height=600 frameBorder=0></iframe>
+
 ### Methods
 ### Time-Delayed Causal Relations with Neural Network Implementations
+<iframe src="assets/rnn_prediction.png" width=800 height=600 frameBorder=0></iframe>
+
 ### Instantaneous Causal Relations with PC Algorithm and Structural Causal Models
+<iframe src="assets/cd_nod.png" width=800 height=600 frameBorder=0></iframe>
+
 ### Combined Time-Delayed and Instantaneous Causal Relations
 ### Results
 #### Contact Info
