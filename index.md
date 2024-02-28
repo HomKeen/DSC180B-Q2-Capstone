@@ -8,6 +8,10 @@ Mentors: Biwei Huang, Babak Salimi
 
 ### Introduction
 ### Data
+* Global Temperature: Goddard Institute for Space Studies (GISS) / NASA
+* CO2 & Methane (CH4): Global Monitoring Division of the National Oceanic and Atmospheric Administration (NOAA)
+* Electricity Generation (Fossil Fuels/Clean) & Petroleum Production: Energy Information Administration (EIA)
+
 <img src="assets/datavis.png" frameBorder=0></img>
 
 ### Methods
