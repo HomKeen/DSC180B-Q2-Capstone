@@ -14,8 +14,8 @@ class M_ANM(object):
         self.kernelY = kernelY
 
     def fit_gp(self, X, y, conf):
-        #kernel = C(1.0, (1e-3, 1e3)) * RBF(1.0, (1e-2, 1e2)) + WhiteKernel(0.1, (1e-10, 1e+1))
-        gpr = GaussianProcessRegressor()
+        kernel = C(1.0, (1e-10, 1e10)) * RBF(1.0, (1e-10, 1e10)) + WhiteKernel(0.1, (1e-10, 1e+10))
+        gpr = GaussianProcessRegressor(kernel = kernel)
 
         # fit Gaussian process, including hyperparameter optimization
         X = X.join(conf)
