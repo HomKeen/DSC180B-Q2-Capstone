@@ -117,7 +117,6 @@ class EarthSystemsDataset(Dataset):
         '''
         Manually choose validation and training data using a year/month index
         '''
-
         self.train_data = self.full_data.loc[train_ind]
         if val_ind is not None:
             self.val_data = self.full_data.loc[val_ind]

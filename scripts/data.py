@@ -5,19 +5,19 @@ Contains methods that grab and clean datasets for analysis.
 import pandas as pd
 import numpy as np
 
-#Grabber function to simplify dataset loading in notebook
+# Grabber function to simplify dataset loading in notebook
 def grab_dataset(dataset, timeframe='monthly'):
     
-    #check for available datasets and timeframe
+    # Check for available datasets and timeframe
     if dataset not in ['global_temp', 'elec_fossil', 'elec_clean', 'co2', 'ch4', 'petroleum']:
         raise ValueError("not a valid dataset")
     if timeframe not in ['yearly', 'monthly']:
         raise ValueError("not a valid timeframe")
     
-    #check for timeframe reference
+    # Check for timeframe reference
     if timeframe == "monthly":
         
-        #global temp data grabber
+        # Global temp data grabber
         if dataset == 'global_temp':
             months_abv = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -44,7 +44,7 @@ def grab_dataset(dataset, timeframe='monthly'):
                            )
             return global_temp
         
-        #fossil fuel electricity generation data grabber
+        # Fossil fuel electricity generation data grabber
         if dataset == 'elec_fossil' or dataset == 'elec_clean':
             
             sector = ('Total Renewable Energy Production' if dataset == 'elec_clean' 
@@ -52,17 +52,14 @@ def grab_dataset(dataset, timeframe='monthly'):
 
             elec_raw = pd.read_csv('../data/electricity-monthly.csv')
             
-            #grab electricity net generation across all sectors
+            # Grab electricity net generation across all sectors
             elec_raw = elec_raw[elec_raw['Description'] == sector]
             
-            #all previous years are yearly averages
+            # All previous years are yearly averages
             elec_raw = elec_raw[elec_raw['YYYYMM'] >= 197301]
             elec_raw['YYYYMM'] = elec_raw['YYYYMM'].astype('str')
             elec_raw['month'] = elec_raw['YYYYMM'].str[-2:]
             elec_raw['year'] = elec_raw['YYYYMM'].str[:4]
-
-            #ensure that electricity generation value is numeric
-            # elec_raw['Value'] = elec_raw['Value'].astype('float')
             
             #month replacement for dataset uniformity
             month_rep = {'01': 'Jan',
@@ -77,7 +74,6 @@ def grab_dataset(dataset, timeframe='monthly'):
                         '10': 'Oct',
                         '11': 'Nov',
                         '12': 'Dec',}
-            # elec_raw['month'] = elec_raw['month'].replace(month_rep)
 
             elec = (elec_raw[['year', 'month', 'Value']]
                     .replace({'month': month_rep})
@@ -91,7 +87,7 @@ def grab_dataset(dataset, timeframe='monthly'):
 
             return elec
             
-        #co2 data grabber    
+        # co2 data grabber    
         if dataset == 'co2':
             co2_raw = pd.read_csv('../data/co2-monthly.csv', comment = '#')
             
@@ -114,7 +110,7 @@ def grab_dataset(dataset, timeframe='monthly'):
             co2 = co2.rename(columns = {'average': 'co2_average'})
             return co2
         
-        #methane data grabber
+        # methane data grabber
         if dataset == 'ch4':
             ch4_raw = pd.read_csv('../data/ch4-monthly.csv', comment = '#')
             
@@ -136,7 +132,7 @@ def grab_dataset(dataset, timeframe='monthly'):
             ch4 = ch4.rename(columns = {'average': 'ch4_average'})
             return ch4
         
-        #petroleum data grabber
+        # petroleum data grabber
         if dataset == 'petroleum':
             petrol_monthly = pd.read_csv('../data/petroleum-monthly.csv').iloc[4, 2:]
             times = petrol_monthly.index.str.split()
@@ -152,7 +148,7 @@ def grab_dataset(dataset, timeframe='monthly'):
 
         
         
-    #yearly data grab (UNFINISHED)
+    #yearly data grab (UNIMPLEMENTED)
     else:
         return 1
         

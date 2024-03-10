@@ -3,7 +3,6 @@ Helper functions for constructing, training, and saving pyTorch neural network (
 '''
 
 import torch
-import numpy as np
 from torch import nn, jit
 from torch.utils.data import DataLoader
 from torch.nn import Flatten, LayerNorm, GRUCell, Dropout
@@ -142,8 +141,6 @@ class GRULayerNorm(jit.ScriptModule):
             hx = self.layer_norm(self.gru_cell(x[i], hx))
             output += [hx]
         
-        
-
         return self.dropout(torch.stack(output)) if self.dropout is not None else torch.stack(output), hx.unsqueeze(0)
 
 
@@ -158,7 +155,6 @@ class Trainer:
                   save_path=None, preload=None, device='cpu', save_freq=1, val_freq='batch'):
         
         '''
-        
         :model (torch.nn.Module): Trainable model
         :loss_fn: torch loss function
         :optimizer: torch optimizer, already initialized with model parameters
@@ -235,7 +231,6 @@ class Trainer:
 
             if lam:
                 loss += self.model.regularize(lam)
-                # print(self.model.regularize(lam))
 
             loss.backward()
             self.optimizer.step()
@@ -270,12 +265,9 @@ class Trainer:
             else:
                 self.train_errors.append(self.get_error('train'))
                 self.val_errors.append(self.get_error('val'))
-
-            
             
             print(f'Took {loop_timer.get(reset=True):.3f}s total\n-------------------------------\n')
             sys.stdout.flush()
-
             
         if self.dataset.val_frac and self.val_freq is None:
             self.print_error()
@@ -289,7 +281,6 @@ class Trainer:
         '''
         Returns the MSE of the model on either the training or validation set
         '''
-
         self.model.eval()
         if subset == 'val':
             return self.get_val_error()[0]
@@ -297,6 +288,9 @@ class Trainer:
             return self.get_train_error()[0]
         
     def get_train_error(self):
+        '''
+        TODO update doc
+        '''
         self.dataset.train_mode()
 
         n_batches = len(self.data_loader)
@@ -316,6 +310,9 @@ class Trainer:
         return total_loss / n_batches, all_pred
     
     def get_val_error(self):
+        '''
+        TODO update doc
+        '''
         prev = torch.from_numpy(self.dataset.train_data.iloc[-self.dataset.lags:].to_numpy()).to(self.device, dtype=torch.float)
         pred = []
         true = []
@@ -355,6 +352,9 @@ class Trainer:
             print(f'val loss: {val_err:>7f}', end=end)
 
     def save_model(self, all_params=True):
+        '''
+        TODO update doc
+        '''
         if all_params:
             torch.save({
                 'epoch': self.cur_epoch,
