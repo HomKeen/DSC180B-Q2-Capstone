@@ -11,6 +11,9 @@ import sys
 from util import Timer
 
 class FilteringLayer(nn.Module):
+    '''
+    TODO finish doc
+    '''
     def __init__(self, shape):
         super().__init__()
         self.filter = nn.Parameter(torch.ones(shape))
@@ -19,6 +22,9 @@ class FilteringLayer(nn.Module):
         return x * self.filter
 
 class EarthSystemsNN(nn.Module):
+    '''
+    TODO finish doc
+    '''
     def __init__(self, sequence):
         super().__init__()
         self.network = sequence
@@ -27,6 +33,9 @@ class EarthSystemsNN(nn.Module):
         return self.network(x)
     
 class EarthSystemsRNN(nn.Module):
+    '''
+    TODO finish doc
+    '''
     def __init__(self, rnn_layers, fc_layers, last_only=False):
         super().__init__()
 
@@ -49,6 +58,9 @@ class EarthSystemsRNN(nn.Module):
         return self.fc_layers(res)
     
 class GrangerComponent(nn.Module):
+    '''
+    TODO finish doc
+    '''
     def __init__(self, rnn_layers, fc_layers, input_size, lags, reg_lags=True, reg_features=True, last_only=False):
         '''Predictor for a single component (xi)'''
         super().__init__()
@@ -87,6 +99,9 @@ class GrangerComponent(nn.Module):
         return reg_features + reg_lags
     
 class GrangerRNN(nn.Module):
+    '''
+    TODO finish doc
+    '''
     def __init__(self, layer_func, n_models, input_size, lags, reg_lags=True, reg_features=True, last_only=False):
         super().__init__()
 
@@ -113,6 +128,7 @@ class GrangerRNN(nn.Module):
 
 class GRULayerNorm(jit.ScriptModule):
     '''
+    TODO finish doc
     One GRU module that applies layer normalization after each time step
     '''
 
@@ -151,8 +167,8 @@ class Trainer:
     Helper class for easily training a model
     '''
 
-    def __init__(self, model, loss_fn, optimizer, dataset, batch_size=1,
-                  save_path=None, preload=None, device='cpu', save_freq=1, val_freq='batch'):
+    def __init__(self, model, loss_fn, optimizer, dataset, batch_size=1,save_path=None, 
+                 preload=None, device='cpu', save_freq=1, val_freq='batch', verbose=True):
         
         '''
         :model (torch.nn.Module): Trainable model
@@ -167,6 +183,7 @@ class Trainer:
                 'batch' -- compute and print validation error after each group of batches; 
                 'epoch' -- compute and print validation error after each epoch; 
                 None -- don't compute validation error until the very end
+        :verbose: (bool) Whether to print training information at the beginning 
         '''
 
         self.model = model
@@ -178,6 +195,7 @@ class Trainer:
         self.device = device
         self.save_freq = save_freq
         self.val_freq = val_freq
+        self.verbose = verbose
 
         # save lists of training/validation errors (updated every epoch)
         self.train_errors = []
@@ -189,24 +207,25 @@ class Trainer:
         self.dataset = dataset
         self.data_loader = DataLoader(self.dataset, batch_size=batch_size, shuffle=True)
 
-        print('\nTRAINING OVERVIEW\n-------------------------------')
-        print('DATA:\n')
-        self.dataset.print_info()
-        print('-------------------------------')
-        print('OPTIMIZER:\n', optimizer, '\n-------------------------------') 
-        print('LOSS FUNCTION:\n', loss_fn, '\n-------------------------------')
-        print('MODEL ARCHITECTURE:\n', model, '\n-------------------------------')
-        print(f'OTHER:')
-        print(f'Loading saved weights from {preload}' if preload else f'Not loading weights')
-        print(f'Will save model to {save_path}' if save_path else 'WARNING: WILL NOT SAVE MODEL')
-        print(f'Training with batch size of {batch_size}')
-        print(f'Running on device {device}')
-
         if preload:
             self.load_model(preload)
 
-        print('Ready to train\n')
-        sys.stdout.flush()
+        if verbose:
+            print('\nTRAINING OVERVIEW\n-------------------------------')
+            print('DATA:\n')
+            self.dataset.print_info()
+            print('-------------------------------')
+            print('OPTIMIZER:\n', optimizer, '\n-------------------------------') 
+            print('LOSS FUNCTION:\n', loss_fn, '\n-------------------------------')
+            print('MODEL ARCHITECTURE:\n', model, '\n-------------------------------')
+            print(f'OTHER:')
+            print(f'Loaded saved weights from {preload}' if preload else f'Not loading weights')
+            print(f'Will save model to {save_path}' if save_path else 'WARNING: WILL NOT SAVE MODEL')
+            print(f'Training with batch size of {batch_size}')
+            print(f'Running on device {device}')
+
+            print('Ready to train\n')
+            sys.stdout.flush()
     
 
     def train_loop(self, lam=None):
@@ -384,8 +403,9 @@ class Trainer:
         self.train_errors = checkpoint['train_errors']
         self.val_errors = checkpoint['val_errors']
 
-        print(f'\tUsing {len(val_ind) if val_ind is not None else 0} validation points')
-        print(f'\tUsing {len(train_ind)} training points')
+        if self.verbose:
+            print(f'\tUsing {len(val_ind) if val_ind is not None else 0} validation points')
+            print(f'\tUsing {len(train_ind)} training points')
 
         self.dataset.split(train_ind, val_ind)
 
