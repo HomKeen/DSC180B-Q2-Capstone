@@ -29,7 +29,7 @@ class EarthSystemsDataset(Dataset):
         :mode: (str) Should be one of ['rnn', 'ann']. Since an RNN and ANN require data in
             different formats, this argument will indicate that.
         is formatted.
-        :normalize: (bool) Whether to normalize the data to (0,1) or not
+        :normalize: (bool) Whether to normalize the data to [0,1] or not
         '''
         assert mode in ('rnn', 'ann'), \
             f'ERROR: {mode} is not a valid value for `mode`. It should be either "rnn" or "ann"'
@@ -116,6 +116,8 @@ class EarthSystemsDataset(Dataset):
     def split(self, train_ind, val_ind):
         '''
         Manually choose validation and training data using a year/month index
+
+        return: None
         '''
         self.train_data = self.full_data.loc[train_ind]
         if val_ind is not None:
@@ -142,7 +144,7 @@ class EarthSystemsDataset(Dataset):
 
         :all_data (list-like of pd.DataFrame): List of DataFrames to trim
 
-        :return: unified DataFrame of all the trimmed data
+        return: unified DataFrame of all the trimmed data
         '''
 
         trimmed_data = []

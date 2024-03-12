@@ -1,5 +1,5 @@
 '''
-Helper functions for constructing, training, and saving pyTorch neural network (NN) models. 
+Helper functions and classes for constructing, training, and saving pyTorch neural network (NN) models. 
 '''
 
 import torch
@@ -12,7 +12,7 @@ from util import Timer
 
 class FilteringLayer(nn.Module):
     '''
-    TODO finish doc
+    A filter that acts as a "gate" for preceding variables. Should be trained with L1 regularization.
     '''
     def __init__(self, shape):
         super().__init__()
@@ -23,7 +23,7 @@ class FilteringLayer(nn.Module):
 
 class EarthSystemsNN(nn.Module):
     '''
-    TODO finish doc
+    A standard feedforward neural network
     '''
     def __init__(self, sequence):
         super().__init__()
@@ -34,7 +34,9 @@ class EarthSystemsNN(nn.Module):
     
 class EarthSystemsRNN(nn.Module):
     '''
-    TODO finish doc
+    A recurrent neural network. Can accept any type of RNN layers, such as LSTM or GRU. It also 
+    has the option to utilize all outputs all time steps or only the last time step, when passing 
+    to the dense layers.
     '''
     def __init__(self, rnn_layers, fc_layers, last_only=False):
         super().__init__()
@@ -59,10 +61,19 @@ class EarthSystemsRNN(nn.Module):
     
 class GrangerComponent(nn.Module):
     '''
-    TODO finish doc
+    A RNN for discovering Granger causality. This network predicts for only one output variable
     '''
     def __init__(self, rnn_layers, fc_layers, input_size, lags, reg_lags=True, reg_features=True, last_only=False):
-        '''Predictor for a single component (xi)'''
+        '''
+        :rnn_layers: (nn.Sequential) Sequential of RNN-type layers.
+        :fc_layers: (nn.Sequential) Sequential of dense (i.e., fully connected) layers.
+        :input_size: (int) Number of features in the input.
+        :lags: (int) Number of time lags to use.
+        :reg_lags: (bool) Whether or not to regularize to discover Granger causality for lags.
+        :reg_features: (bool) Whether or not to regularize to discover Granger causality for features. 
+        :last_only: (bool) Whether or not to only use the last time step output of each RNN layer. Setting this
+                    to true will drastically reduce runtime.
+        '''
         super().__init__()
 
         self.feature_filter = (FilteringLayer(input_size) if reg_features else None)
@@ -100,14 +111,29 @@ class GrangerComponent(nn.Module):
     
 class GrangerRNN(nn.Module):
     '''
-    TODO finish doc
+    A RNN for discovering Granger causality. This network predicts for all variables at once via multiple 
+    independent GrangerComponents. Combining them into a single loss function which vastly 
+    improves training time.
     '''
     def __init__(self, layer_func, n_models, input_size, lags, reg_lags=True, reg_features=True, last_only=False):
+        '''
+        :layer_func: (function) A function that should return a tuple (rnn_layers, fc_layers) which are each
+                    nn.Sequential of RNN-type layers and dense layers, respectively. This function should take
+                    an input size and output size as arguments.
+        :n_models: (int) Number of variables to predict for; one for each model.
+        :input_size: (int) Number of features in the input
+        :lags: (int) Number of time lags to use
+        :reg_lags: (bool) Whether or not to regularize to discover Granger causality for lags
+        :reg_features: (bool) Whether or not to regularize to discover Granger causality for features 
+        :last_only: (bool) Whether or not to only use the last time step output of each RNN layer. Setting this
+                    to true will drastically reduce runtime.
+        '''
+
         super().__init__()
 
         self.models = nn.ModuleList()
         for _ in range(n_models):
-            rnn_layers, fc_layers = layer_func(input_size, 1, lags)
+            rnn_layers, fc_layers = layer_func(input_size, 1)
             self.models.append(
                 GrangerComponent(rnn_layers, fc_layers, input_size, lags, reg_lags=reg_lags, 
                                  reg_features=reg_features, last_only=last_only)
@@ -128,8 +154,7 @@ class GrangerRNN(nn.Module):
 
 class GRULayerNorm(jit.ScriptModule):
     '''
-    TODO finish doc
-    One GRU module that applies layer normalization after each time step
+    One GRU layer that applies layer normalization after each time step.
     '''
 
     def __init__(self, input_size, hidden_size, dropout=None, bias=True, device=None, dtype=None):
@@ -164,10 +189,16 @@ class GRULayerNorm(jit.ScriptModule):
     
 class Trainer:
     '''
-    Helper class for easily training a model
+    Helper class for easily training a model. It can:
+        - Train a model with only a few lines
+        - Print information while training 
+        - Save a model and training info
+        - Train from scratch or resume from a previous iteration
+        - Compute training or validation error
+        - Use desired batch size, device, learning rate, etc.
     '''
 
-    def __init__(self, model, loss_fn, optimizer, dataset, batch_size=1,save_path=None, 
+    def __init__(self, model, loss_fn, optimizer, dataset, batch_size=1, save_path=None, 
                  preload=None, device='cpu', save_freq=1, val_freq='batch', verbose=True):
         
         '''
@@ -230,8 +261,11 @@ class Trainer:
 
     def train_loop(self, lam=None):
         '''
-        Trains the model for one epoch (a single pass through the data)
-        if lam is a float, then the model has custom regularization to apply
+        Trains the model for one epoch (a single pass through the data).
+
+        :lam: L1 regularization constant for the Granger filter(s)
+
+        return: None
         '''
         self.model.train()
         self.dataset.train_mode()
@@ -265,6 +299,13 @@ class Trainer:
                 print('')
             
     def run_training(self, epochs, lam=None):
+        '''
+        Train the model for a specified number of epochs.
+
+        :lam: L1 regularization constant for the Granger filter(s)
+
+        return: None
+        '''
         # lam tells us that the model has weights to be custom regularized with its regularize() function
         main_timer, loop_timer = Timer(), Timer()
         print(f'Beginning training from epoch {self.cur_epoch+1} for {epochs} epochs')
@@ -298,7 +339,11 @@ class Trainer:
     
     def get_error(self, subset):
         '''
-        Returns the MSE of the model on either the training or validation set
+        Returns the error of the model on either the training or validation set
+
+        :subset: (str) One of 'train' or 'val', indicating error for the training or validation set
+
+        :return: (float) The error on the specified subset of data
         '''
         self.model.eval()
         if subset == 'val':
@@ -308,7 +353,9 @@ class Trainer:
         
     def get_train_error(self):
         '''
-        TODO update doc
+        Get the train error as well as the predictions on the train data
+
+        return: tuple of (error (float), predictions (list)) 
         '''
         self.dataset.train_mode()
 
@@ -330,7 +377,11 @@ class Trainer:
     
     def get_val_error(self):
         '''
-        TODO update doc
+        Get the validation error as well as the predictions on the validation data. The validation
+        predictions are computed by assuming we know nothing past the training data; the model's
+        predictions serve as inputs to the next time step.
+
+        return: tuple of (error (float), predictions (list)) 
         '''
         prev = torch.from_numpy(self.dataset.train_data.iloc[-self.dataset.lags:].to_numpy()).to(self.device, dtype=torch.float)
         pred = []
@@ -357,7 +408,14 @@ class Trainer:
     
     def print_error(self, record=False, subsets=['train' ,'val'], end='\n'):
         '''
-        Prints training and/or validation errors. Can also save 
+        Prints training and/or validation errors. Can also record the error for retrieval later.
+
+        :record: (bool) Whether or not to save the error to self.train_error or self.val_error
+        :subsets: (list) Must contain 'train', 'val', or both; specifies which portions of 
+                    the dataset to print/record the error for
+        :end: (str) What to print at the end after the error. Used for formatting purposes.
+
+        return: None
         '''
         if 'train' in subsets:
             train_err = self.get_error("train")
@@ -372,7 +430,13 @@ class Trainer:
 
     def save_model(self, all_params=True):
         '''
-        TODO update doc
+        Save the model to the file specified by `self.save_path`. 
+
+        :all_params: (bool) Whether or not to save all information including training info, or just
+                    the model state_dict. The latter is helpful if we do not wish to continue training,
+                    only for testing and predicting.
+        
+        return: None
         '''
         if all_params:
             torch.save({
@@ -389,7 +453,12 @@ class Trainer:
 
     def load_model(self, model_path):
         '''
-        Load a previously trained model to continue training
+        Load a previously trained model to continue training. The previous model must have been saved 
+        with `all_params=True`.
+
+        :model_path: (str) Path to the model to load
+
+        return: None
         '''
         checkpoint = torch.load(model_path, map_location=torch.device(self.device))
         self.model.load_state_dict(checkpoint['model_state_dict'])
@@ -410,6 +479,11 @@ class Trainer:
         self.dataset.split(train_ind, val_ind)
 
     def set_learning_rate(self, alpha):
+        '''
+        Manually set the learning rate.
+
+        :alpha: (float) The new learning rate
+        '''
         for group in self.optimizer.param_groups:
             group['lr'] = alpha
         

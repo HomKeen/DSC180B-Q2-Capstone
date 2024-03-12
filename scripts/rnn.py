@@ -21,7 +21,7 @@ which was also the simplest. This is because all the other layers ended up overf
 had ~480 data points.
 '''
 
-def rnn_layers1(in_size, label_size, lags):
+def rnn_layers1(in_size, label_size):
     # this is a lastonly sequence
     # in_size is number of variables
     h_size1 = 25
@@ -41,7 +41,7 @@ def rnn_layers1(in_size, label_size, lags):
 
     return Sequential(*rnn_layers), Sequential(*fc_layers)
 
-def rnn_layers2(in_size, label_size, lags):
+def rnn_layers2(in_size, label_size):
     # this is a lastonly sequence
     # in_size is number of variables
     h_size1 = 50
@@ -60,7 +60,7 @@ def rnn_layers2(in_size, label_size, lags):
 
     return Sequential(*rnn_layers), Sequential(*fc_layers)
 
-def rnn_layers3(in_size, label_size, lags):
+def rnn_layers3(in_size, label_size):
     # this is a lastonly sequence
     # in_size is number of variables
     h_size1 = 100
@@ -78,7 +78,7 @@ def rnn_layers3(in_size, label_size, lags):
 
     return Sequential(*rnn_layers), Sequential(*fc_layers)
 
-def rnn_layers4(in_size, label_size, lags):
+def rnn_layers4(in_size, label_size):
     # in_size is number of variables
     # this is a lastonly sequence
     h_size1 = 6
@@ -97,7 +97,7 @@ def rnn_layers4(in_size, label_size, lags):
 
     return Sequential(*rnn_layers), Sequential(*fc_layers)
 
-def rnn_layers5(in_size, label_size, lags):
+def rnn_layers5(in_size, label_size):
     # in_size is number of variables
     # this is a lastonly sequence
     h_size1 = 25
@@ -118,7 +118,7 @@ def rnn_layers5(in_size, label_size, lags):
     return Sequential(*rnn_layers), Sequential(*fc_layers)
 
 
-def rnn_layers6(in_size, label_size, lags):
+def rnn_layers6(in_size, label_size):
     # in_size is number of variables
     # this is a lastonly sequence
     h_size1 = 15
@@ -277,7 +277,6 @@ if __name__ == '__main__':
 
     data = EarthSystemsDataset(data_var_names, y_vals=y_vals, add_index=False, val_frac=0.03, lags=lags, mode='rnn', normalize=True)
     data.train_mode()
-    # rnn_layers, fc_layers = rnn_layers4(len(data_var_names), len(y_vals), lags)
 
     model = GrangerRNN(rnn_layers4, len(y_vals), len(data.data.columns), lags=lags, reg_lags=False, last_only=True).to(device)
     loss_fn = nn.MSELoss()
