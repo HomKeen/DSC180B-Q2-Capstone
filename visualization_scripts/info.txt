@@ -1,1 +1,0 @@
-scripts for visualization used in website,report, and poster. May not work from this folder and if you wish to run these, you will have to simply move them out of this folder and into the scripts folder
