@@ -1,3 +1,5 @@
 remote_theme: pages-themes/slate@v0.2.0
+title: [Causal Relations in the Earth System]
+description: [A Causal Analysis of Instantaneous and Time-Delayed Relations in Earth System Data]
 plugins:
 - jekyll-remote-theme # add this line to the plugins list if you already have one
