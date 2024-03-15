@@ -49,7 +49,7 @@ We are using two different models to detect time-lagged (long-term effect) and i
 <details>
   <summary>Instantaneous Causal Relations with CD-NOD Algorithm and Structural Causal Models</summary>
   <br>
-  Using the causallearn python package, the entire dataset was run through a CD-NOD algorithm to find instantaneous causal relations between each variable. This can then be visualized through a node graph. Using the causal links found from the CD-NOD algorithm, an additive noise model (ANM) was applied to each causal link to discover the direction of the link between each node. The ANM returns probabilities of causal direction between each given variable, and thus an $\alpha$ of 0.05 will be used to determine enough probable cause for a causal relation. The detection of instantaneous relations is important, since our data has been averaged on a monthly basis. One month is more than enough time for our climate variables to affect one another, but this change would appear to be instantaneous in our data.
+  Using the causallearn python package, the entire dataset was run through a CD-NOD algorithm to find instantaneous causal relations between each variable. This can then be visualized through a node graph. Using the causal links found from the CD-NOD algorithm, an additive noise model (ANM) was applied to each causal link to discover the direction of the link between each node. The ANM returns probabilities of causal direction between each given variable, and thus an threshold of 0.05 will be used to determine enough probable cause for a causal relation. The detection of instantaneous relations is important, since our data has been averaged on a monthly basis. One month is more than enough time for our climate variables to affect one another, but this change would appear to be instantaneous in our data.
 </details>
 
 <br>
@@ -65,21 +65,30 @@ We are using two different models to detect time-lagged (long-term effect) and i
 
 ### Time-Delayed Causal Relations with Neural Network Implementations
 
-<center><h3>Prediction Performance of the Neural Network model for each Feature</h3></center>
+<center><h4>Prediction Performance of the Neural Network model for each Feature</h4></center>
 <img src="assets/rnn_predictions.png" frameBorder=2>
 
-<center><h3>Heatmap of Granger Causality Importance</h3></center>
+<center><h4>Heatmap of Granger Causality Importance</h4></center>
 <img src="assets/rnn_importance_heatmap.png" frameBorder=2>
 The direction of causality is denoted as (row -> column). For example:
 the value of Importance of Petroleum Production for predicting Electricity (Fossil Fuels) is 0.3.
 
 ### Instantaneous Causal Relations with CD-NOD Algorithm and Structural Causal Models
+
+<center><h4>Node-Link Diagram of Causal Relations using CD-NOD Algorithm</h4></center>
 <img src="assets/scm_node.png" frameBorder=2>
+Using an additive noise model to analyze the direction between Methane and Petroleum Production, we found the causal direction goes both ways: (Methane -> Petroleum Production) & (Petroleum Production -> Methane)
 
 ### Combined Time-Delayed and Instantaneous Causal Relations
-<img src="assets/combined_node.png" frameBorder=2>
 
-<button onclick="window.location.href='https://bing.com';">Click</button>
+<center><h4>Node-Link Diagram of Causal Relations using CD-NOD Algorithm on NN Residuals</h4></center>
+<img src="assets/combined_node.png" frameBorder=2>
+Using an additive noise model to analyze the direction between Methane and Petroleum Production, we found the causal direction goes both ways: (Methane -> Petroleum Production) & (Petroleum Production -> Methane)
+
+Using an additive noise model to analyze the direction between Electricity (Fossil Fuels) and Electricity (Clean), we found the causal direction goes both ways: (Electricity (Fossil Fuels) -> Electricity (Clean)) & (Electricity (Clean) -> Electricity (Fossil Fuels))
+
+### Findings
+As you can see, there are a lot of causal relations connecting each feature within the earth system. From our results, many of the causal directions make sense from previous knowledge, like Petroleum Production being an important factor in Global Temperature change. We can see particularly strong relations with relations that are consistent from model to model. However, some relationships are completely different between each method, such as Electricity (Fossil Fuels) and Global Temperature having three different causal relations: No relation (Time-Lagged), Global Temperature causing Fossil Fuel Electricity (Instantaneous), and Fossil Fuel Electricity causing Global Temperature (Combined). 
 
 #### For more information:
 Please refer to our research <a href="TEST_REPORT.pdf">report</a>
