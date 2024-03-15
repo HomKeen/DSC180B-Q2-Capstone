@@ -24,7 +24,7 @@ In our causal analysis, We will focus specifically on human-related activities t
 
 ### Methods
 ### Time-Delayed Causal Relations with Neural Network Implementations
-<img src="assets/rnn_predictions.png" frameBorder=2>
+<img src="assets/rnn_importance_heatmap.png" frameBorder=2>
 
 ### Instantaneous Causal Relations with PC Algorithm and Structural Causal Models
 <img src="assets/scm_node.png" frameBorder=2>
