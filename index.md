@@ -44,11 +44,15 @@ We are using two different models to detect time-lagged (long-term effect) and i
   With the assistance of the python package PyTorch, we trained several artificial neural network models on a large portion of the dataset, leaving some recent data as a validation set. This consisted of optimizing the number of layers in our Recurrent Neural Network and the ideal lag value. This model is used to determine Granger causality between variables. We determine causality by systematically leaving out one variable from the training data, training the model, and checking if the error is higher than that of a model trained on the full dataset. We retrain the same model many times to reduce the influence of randomness, and perform a t-test on the resulting errors. Additionally, we will use a NN (trained on the full dataset) to get the residuals when predicting for each variable; these residuals are later used in SCMs.
 </details>
 
+<br>
+
 <details>
   <summary>Instantaneous Causal Relations with CD-NOD Algorithm and Structural Causal Models</summary>
   <br>
   Using the causallearn python package, the entire dataset was run through a CD-NOD algorithm to find instantaneous causal relations between each variable. This can then be visualized through a node graph. Using the causal links found from the CD-NOD algorithm, an additive noise model (ANM) was applied to each causal link to discover the direction of the link between each node. The ANM returns probabilities of causal direction between each given variable, and thus an $\alpha$ of 0.05 will be used to determine enough probable cause for a causal relation. The detection of instantaneous relations is important, since our data has been averaged on a monthly basis. One month is more than enough time for our climate variables to affect one another, but this change would appear to be instantaneous in our data.
 </details>
+
+<br>
 
 <details>
   <summary>Combined Time-Delayed and Instantaneous Causal Relations</summary>
