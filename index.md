@@ -62,6 +62,27 @@ In our causal analysis, We will focus specifically on human-related activities t
 <button onclick="window.location.href='https://bing.com';">Click</button>
 
 ### References
+(EIA), U.S. Energy Information Administration’s., “The Monthly Energy Review.” [Link](https://www.eia.gov/totalenergy/data/monthly/)
+
+EPA., “Sources of Greenhouse Gas Emissions.” [Link](https://www.epa.gov/ghgemissions/sources-greenhouse-gas-emissions#:~:text=Carbon%20dioxide%20(CO2)%20makes,natural%20gas%2C%20to%20produce%20electricity.)
+
+GISTEMP-Team. 2024. “GISS Surface Temperature Analysis (GISTEMP).” NASA Goddard
+Institute for Space Studies. [Link](https://data.giss.nasa.gov/gistemp/)
+
+Runge, Jakob, Andreas Gerhardus, Gherardo Varando, Veronika Eyring, and Gustau
+Camps-Valls. 2023. “Causal inference for time series.” Nature Reviews Earth & Environ-
+ment 4(7): 487–505. [Link](https://www.nature.com/articles/s43017-023-00431-y)
+
+Song, Jiecheng, and Merry Ma. 2023. “Climate Change: Linear and Nonlinear Causality
+Analysis.” Stats 6(2): 626–642. [Link](https://www.mdpi.com/2571-905X/6/2/40)
+
+X. Lan, K.W. Thoning, and E.J. Dlugokencky., “Trends in globally-averaged CH4, N2O,
+and SF6 determined from NOAA Global Monitoring Laboratory measurements.” [Link](https://gml.noaa.gov/ccgg/trends_doi.html)
+
+X. Lan, P. Tans, and K.W. Thoning., “Trends in globally-averaged CO2 determined from
+NOAA Global Monitoring Laboratory measurements.” [Link](https://gml.noaa.gov/ccgg/trends/global.html?doi=10.15138/9n0h-zh07)
+
+
 #### Contact Info
 * Keenan Hom: kwhom@ucsd.edu
 * Dean Carrion: dcarrion@ucsd.edu
