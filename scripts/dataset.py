@@ -1,6 +1,5 @@
 '''
-Contains methods and classes for assembling earth systems data into a 
-coherent table.
+Contains a class for assembling earth systems data into a coherent table.
 '''
 
 import pandas as pd
@@ -53,12 +52,12 @@ class EarthSystemsDataset(Dataset):
         It will select full data by default.
         '''
 
-
         raw_datasets = [grab_dataset(var_name, timeframe=timeframe) for var_name in data_var_names]
         self.full_data = EarthSystemsDataset.trim_data(raw_datasets) 
 
         if add_index:
             self.full_data['index'] = list(range(len(self.full_data)))
+            self.data_var_names = self.data_var_names + ['index']
 
         if normalize:
             normalizer = MinMaxScaler()
@@ -79,8 +78,6 @@ class EarthSystemsDataset(Dataset):
         self.data = self.train_data
 
         
-
-
     def __len__(self):
         return self.data.shape[0] - self.lags
 

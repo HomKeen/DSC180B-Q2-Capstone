@@ -1,3 +1,6 @@
+'''
+Script for detecting time-lagged causality (Granger causality) among the variables
+'''
 import torch
 import sys
 import os
@@ -14,13 +17,13 @@ from dataset import EarthSystemsDataset
 from nn_util import GrangerRNN, EarthSystemsRNN, GRULayerNorm, Trainer
 from util import Timer
 
+DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 '''
 Defined below are several architectures of RNNs that we experimented with. The most successful was `rnn_layers4`, 
 which was also the simplest. This is because all the other layers ended up overfitting the data which only 
 had ~480 data points.
 '''
-
 def rnn_layers1(in_size, label_size):
     # this is a lastonly sequence
     # in_size is number of variables
@@ -141,16 +144,17 @@ def rnn_layers6(in_size, label_size):
 
 
 
-'''
-Finding the best lag value:
 
-Finding the ideal number of time lags is essential in time series analysis. 
-However, our program found that the most optimal amount of lags to use was as many as possible.
-Since we couldn't pass the entire dataset in (i.e. with 483 lags) as a single training point, 
-we picked 30 as a "high enough" number of lags. This struck a balance between improving model 
-performance on training data and determining Granger causality
-'''
 def find_best_lag(all_lags, k):
+    '''
+    Performs grid search for a given set of lag values to try, and records the error for each one.
+    A lag value that results in the lowest error is the best one to use.
+
+    :all_lags: (list-like of int) List of lag values to try.
+    :k: (int) Number of runs to perform per lag, to get a more stable outcome.
+
+    return: None
+    '''
     all_var_names = ['global_temp', 'petroleum', 'elec_fossil', 'elec_clean', 'co2', 'ch4']
     y_vals = ['temp_change', 'petroleum', 'elec_fossil', 'elec_clean', 'co2_average', 'ch4_average']
 
@@ -176,12 +180,12 @@ def find_best_lag(all_lags, k):
             for i in range(k):
                 sys.stdout = out
                 rnn_layers, fc_layers = rnn_layers2(len(all_var_names), 1, lag)
-                model = EarthSystemsRNN(rnn_layers, fc_layers, last_only=True).to(device)
+                model = EarthSystemsRNN(rnn_layers, fc_layers, last_only=True).to(DEVICE)
                 loss_fn = nn.MSELoss()
                 optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=5e-3)
             
                 trainer = Trainer(model, loss_fn, optimizer, dataset=data, batch_size=10, 
-                                  save_path=None, preload=None, device=device, val_freq='epoch')
+                                  save_path=None, preload=None, device=DEVICE, val_freq='epoch')
             
                 trainer.run_training(epochs)
                 val_err = trainer.get_error('val')
@@ -196,17 +200,20 @@ def find_best_lag(all_lags, k):
             sys.stdout.flush()
 
 
-'''
-Retrieving Granger Causality:
-
-Below, we have code that retrieves the feature filter layer from each model. From our experiments,
-we find that a filter value >0.01 implies Granger causality. We can then find the average filter 
-from each model.
-'''
 def get_importances(model_path, data):
-    model = GrangerRNN(rnn_layers4, len(y_vals), len(data.data.columns), lags=lags, reg_lags=False, last_only=True).to(device)
+    '''
+    Retrieve the 'importances' that each variable has for predicting each other variable,
+    as determined by the given model during training.
 
-    checkpoint = torch.load(model_path, map_location=device)
+    :model_path: (str) Path to the trained model
+
+    return: pd.DataFrame of size (num_variables, num_variables). The entry in row i and column j
+            tells us the 'importance' that series i has for predicting future values of series j. 
+    '''
+    model = GrangerRNN(rnn_layers4, len(data.y_vals), len(data.data_var_names), 
+                       lags=data.lags, reg_lags=False, last_only=True).to(DEVICE)
+
+    checkpoint = torch.load(model_path, map_location=DEVICE)
     model.load_state_dict(checkpoint['model_state_dict'])
 
     df_imp = pd.DataFrame(columns=data.data.columns, index=data.data.columns)
@@ -216,6 +223,15 @@ def get_importances(model_path, data):
     return df_imp
 
 def get_all_importances(model_paths):
+    '''
+    Retrieve all the 'importances' that each variable has for predicting each other variable,
+    as determined by the models during training. Averages over each model provided.
+
+    :model_paths: (list-like of str) Paths to all models.
+
+    return: pd.DataFrame with index of size (num variables * num models), and one column for 
+            each variable. 
+    '''
     data_var_names = ['global_temp', 'petroleum', 'elec_fossil', 'elec_clean', 'co2', 'ch4']
     y_vals = ['temp_change', 'petroleum', 'elec_fossil', 'elec_clean', 'co2_average', 'ch4_average']
     lags = 30
@@ -233,6 +249,15 @@ def get_all_importances(model_paths):
     return df_all_imp
 
 def plot_importance_hist(all_imp, indep_var, dep_var):
+    '''
+    Plots the histogram of importance of `indep_var` for forecasting `dep_var`, over all the given models.
+
+    :all_imp: pd.DataFrame. Output of get_all_importances.
+    :indep_var: (str) Name of the independent variable.
+    :dep_var: (str) Name of the dependent variable.
+
+    return: None
+    '''
     vals = all_imp[all_imp['var'] == indep_var][dep_var]
 
     plt.hist(vals)
@@ -240,24 +265,7 @@ def plot_importance_hist(all_imp, indep_var, dep_var):
 
 
 '''
-Training the model:
-
-The model `GrangerRNN` predicted for all 6 variables at once, using 6 independent RNNs that each 
-predicted for one variable. In general, the model would overfit the data, however this doesn't matter 
-for our objective since we are not trying to forecast the future. The same model is trained from different 
-random seeds many times in order to find a stable outcome. This is necessary since our dataset is small, 
-meaning that results vary between runs. 
-
-To predict causal relationships between variables, an approach used by Horvath et al, 2022. The approach 
-involves placing a "filtering" layer before the RNN that multiplies each of the 6 variables by a filter. 
-During training, these filters are regularized with L1 regularization to encourage the network to eliminate 
-certain variables. The effect is a network that discards variables that it deems unnecessary to predict; 
-that is, if the filter for series *j* is 0 (or near 0) in a network predicting for series *i*, then we 
-can conclude that series *j* does not Granger cause series *i*.
-
-Below is an example of how we would load and train one of the models.
-
-See the `nn_util.py` file for details about training.
+Uncomment the following block to run code that tests for the best lag value
 '''
 
 # if __name__ == '__main__':
@@ -266,49 +274,49 @@ See the `nn_util.py` file for details about training.
 #     find_best_lag(lags, 5)
 
 if __name__ == '__main__':
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     data_var_names = ['global_temp', 'petroleum', 'elec_fossil', 'elec_clean', 'co2', 'ch4']
     y_vals = ['temp_change', 'petroleum', 'elec_fossil', 'elec_clean', 'co2_average', 'ch4_average']
     lags = 30
     lam = 1e-3
     lr = 2e-4
+    batch_size = 16
+    save_freq = 25 # Save the model every 25 epochs
     preload = 'models/rnn_granger.pth' 
     save_path = 'models/rnn_granger.pth'
 
     data = EarthSystemsDataset(data_var_names, y_vals=y_vals, add_index=False, val_frac=0.03, lags=lags, mode='rnn', normalize=True)
     data.train_mode()
 
-    model = GrangerRNN(rnn_layers4, len(y_vals), len(data.data.columns), lags=lags, reg_lags=False, last_only=True).to(device)
+    model = GrangerRNN(rnn_layers4, len(y_vals), len(data.data.columns), lags=lags, reg_lags=False, last_only=True).to(DEVICE)
     loss_fn = nn.MSELoss()
     optimizer = optim.NAdam(model.parameters(), lr=lr)
 
     print(f'Using random seed {torch.seed()}')
     print(f'LAMBDA={lam}')
-    trainer = Trainer(model, loss_fn, optimizer, dataset=data, batch_size=16, save_path=save_path, 
-                    preload=preload, device=device, save_freq=25, val_freq='epoch')
+    trainer = Trainer(model, loss_fn, optimizer, dataset=data, batch_size=batch_size, save_path=save_path, 
+                    preload=preload, device=DEVICE, save_freq=save_freq, val_freq='epoch')
 
+    # UNCOMMENT TO RUN TRAINING
     # trainer.run_training(250, lam=lam)
 
 
     # A training error <0.009 is considered overfit. Overfitting is not ideal, but acceptable for our objective
     # A validation error <0.02 is preferred, but again not essential
-    trainer.get_error('train'), trainer.get_error('val')
+    print(f'Training error: {trainer.get_error("train")}; validation error: {trainer.get_error("val")}')
+          
 
-    # get the training and validation errors 
+    # Get the training and validation errors 
     data.train_mode()
     with torch.no_grad():
         pred_loader = DataLoader(data, batch_size=1, shuffle=False)
         pred = [data.data.reset_index()[y_vals].iloc[0]]*lags \
-                + [model(X.to(device, dtype=torch.float)) for X, y in pred_loader]
+                + [model(X.to(DEVICE, dtype=torch.float)) for X, y in pred_loader]
         _, val_pred = trainer.get_val_error()
         pred = pred + val_pred
     pred = torch.tensor(pred)
 
 
-    '''
-    Below are prediction plots for each of the 6 variables. We can see that the training 
-    predictions are quite accurate, however the validation forecasts are not. 
-    '''
+    # Plot predictions vs. true values for all variables
     fig, axes = plt.subplots(6, 1, figsize=(15,18))
     for i in range(len(axes)):
         axes[i].set_title(data.data.columns[i])
@@ -318,11 +326,9 @@ if __name__ == '__main__':
 
         axes[i].legend()
     fig.tight_layout()
-    '''
-    Below is a plot of the validation error during training. We can see that it is very unstable,
-    implying an overfit. This further emphasizes the need to train multiple times from scratch.
-    '''
+    
 
+    # Plot validation error during training
     plt.figure('errors', figsize=(18,8))
 
     plt.plot(trainer.val_errors[50:], label='val')
@@ -336,17 +342,11 @@ if __name__ == '__main__':
     df_gc = all_imp.groupby('var').mean().drop(index='index').reindex(['temp_change', 'petroleum', 'elec_fossil', 'elec_clean', 'co2_average', 'ch4_average'])
     print(df_gc)
 
-    '''
-    Above, an entry in row `var1` and column `var2` is the filter value that quantifies the importance 
-    of `var1` in predicting `var2`. We can see many of these make sense; for example `co2` (0.102), `ch4`
-    (0.073), and `petroleum` (0.191) affect `temp_change` as shown in the first column. However, some 
-    entries don't make sense, such as `ch4` and `co2` affecting `elec_fossil` (it should be the other 
-    way around, based on prior knowledge). This is likely a spurious correlation, due to external factors 
-    not included in this dataset.
-    '''
+    
+    # Plot heatmaps
     plt.figure('GC')
     sns.heatmap(df_gc)
-    # if we threshold by saying that >0.01 implies Granger causality, we get the following
+    # If we threshold by saying that >0.01 implies Granger causality, we get the following
     plt.figure('GC_thresh')
     sns.heatmap(df_gc > 0.01)
 

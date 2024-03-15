@@ -1,3 +1,10 @@
+'''
+Script that implements an multivariate additive noise model (MANM) that discovers causal direction
+between two variables, given confounding variables.
+
+Derived from ANM from causallearn.
+'''
+
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF
 from sklearn.gaussian_process.kernels import ConstantKernel as C
@@ -30,7 +37,6 @@ class M_ANM(object):
 
 
         # test x->y
-
         pred_y = self.fit_gp(data_x, data_y, conf)
         res_y = data_y - pred_y
 
@@ -38,7 +44,6 @@ class M_ANM(object):
 
 
         # test y->x
-
         pred_x = self.fit_gp(data_y, data_x, conf)
         res_x = data_x - pred_x
         pval_backward, _ = kci.compute_pvalue(data_y, res_x)

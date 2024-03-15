@@ -4,14 +4,16 @@ done by fitting an SCM to the residuals of the time-lagged predictions.
 '''
 
 import torch
+import pandas as pd
 
 from torch.utils.data import DataLoader
 from matplotlib import pyplot as plt
 from causallearn.search.ConstraintBased.PC import pc
+from causallearn.search.FCMBased.ANM.ANM import ANM
 
 from dataset import EarthSystemsDataset
 from nn_util import GrangerRNN
-from rnn import rnn_layers4
+from scripts.time_lagged import rnn_layers4
 
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -27,7 +29,8 @@ def get_residuals(model_path, num_models, data, lags):
     return: torch.Tensor of shape (num_points, num_features) containing the residual for each time step
             for each feature.
     '''
-    model = GrangerRNN(rnn_layers4, num_models, len(data.data.columns), lags=lags, reg_lags=False, last_only=True).to(DEVICE)
+    model = GrangerRNN(rnn_layers4, num_models, len(data.data_var_names), 
+                       lags=lags, reg_lags=False, last_only=True).to(DEVICE)
     checkpoint = torch.load(model_path, map_location=DEVICE)
     model.load_state_dict(checkpoint['model_state_dict'])
 
@@ -71,7 +74,7 @@ if __name__ == '__main__':
     all_res = get_all_residuals(model_paths, lags)
     # Calculate the mean residuals across all models to get a more stable outcome
     mean_res = all_res.mean(dim=0)
-
+    # Using PC algorithm, find the SCM
     cg2 = pc(mean_res.numpy())
     
 
@@ -91,9 +94,22 @@ if __name__ == '__main__':
         axes[i].legend()
 
     
-    '''
-    Visualize instantaneous causal relations of the residuals. This gives us a picture of the causal relations
-    that time-lagged Granger causality could not discover- the relationships among variables in the same time step.
-    '''
+    # Visualize the instantaneous relations
     plt.figure('Causal Graph of Residuals')
     cg2.draw_pydot_graph(labels=data_var_names)
+
+    # Use ANMs to determine causal directions
+    temp_data = pd.DataFrame(mean_res, columns = data_var_names)
+    anm = ANM()
+
+    X = temp_data['elec_clean']
+    y = temp_data['elec_fossil']
+    p_value_forward, p_value_backward = anm.cause_or_effect(X.array.reshape(-1,1),y.array.reshape(-1,1))
+    print('ANM p-values for elec_clean -- elec_fossil:')
+    print(p_value_forward, p_value_backward)
+
+    X = temp_data['petroleum']
+    y = temp_data['ch4']
+    p_value_forward, p_value_backward = anm.cause_or_effect(X.array.reshape(-1,1),y.array.reshape(-1,1))
+    print('ANM p-values for petroleum -- ch4:')
+    print(p_value_forward, p_value_backward)

@@ -3,7 +3,6 @@ Contains methods that grab and clean datasets for analysis.
 '''
 
 import pandas as pd
-import numpy as np
 
 # Grabber function to simplify dataset loading in notebook
 def grab_dataset(dataset, timeframe='monthly'):

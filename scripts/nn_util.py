@@ -103,7 +103,7 @@ class GrangerComponent(nn.Module):
         return self.fc_layers(res)
 
     def regularize(self, lam):
-        # force some of the filtering features to be 0, helping us decide Granger causality
+        # force some of the filtering features to be 0 with L1 regularization, helping us decide Granger causality
         reg_features = (lam * torch.abs(self.feature_filter.filter).sum() if self.reg_features else 0)
         reg_lags = (lam * torch.abs(self.lags_filter.filter).sum() if self.reg_lags else 0)
 
