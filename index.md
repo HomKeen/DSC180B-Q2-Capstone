@@ -56,7 +56,7 @@ We are using two different models to detect time-lagged (long-term effect) and i
   We are also able to combine NNs and SCMs to create a model that can detect both time-lagged and instantaneous causal relations. First, we fit a NN to the full dataset, which will attempt to predict one time step into the future using a specified number of lags. Then, we find the residuals between the predicted and actual data, and plug this in as input to an SCM. The SCM, in determining causal relations between residuals, will be able to find the instantaneous causal relations that our time-lagged model misses.
 </details>
 
-### Results
+<center><h2>Results</h2></center>
 ### Time-Delayed Causal Relations with Neural Network Implementations
 <img src="assets/rnn_predictions.png" frameBorder=2>
 <img src="assets/rnn_importance_heatmap.png" frameBorder=2>
