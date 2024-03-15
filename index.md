@@ -3,6 +3,7 @@ Authors: Keenan Hom, Dean Carrion, Nithilan Muruganandham, Arnav Khanna
 Mentors: Biwei Huang, Babak Salimi
 
 ---
+<center><img src="assets/earth_sys.png" frameBorder=20></center>
 
 ### Introduction
 Climate change is one of the most researched topics in the scientific community. The importance of studying such a topic cannot be understated, as earth system studies help us understand other aspects of science such as extreme weather, air quality, and human health. To better understand the driving features behind the massive system of "Earth" is important, not just for planet longevity, but also for human longevity. From previous research, we understand that various human activities are the main contributing factors towards negative climate change like global warming and rising sea levels. Understanding which of these activities are the most impactful helps us target and stop or slow the systems in place that harm our environment.
@@ -86,7 +87,7 @@ Using an additive noise model to analyze the direction between Methane and Petro
 Using an additive noise model to analyze the direction between Electricity (Fossil Fuels) and Electricity (Clean), we found the causal direction goes both ways: (Electricity (Fossil Fuels) -> Electricity (Clean)) & (Electricity (Clean) -> Electricity (Fossil Fuels))
 
 ### Findings
-As you can see, there are a lot of causal relations connecting each feature within the earth system. From our results, many of the causal directions make sense from previous knowledge, like Petroleum Production being an important factor in Global Temperature change. We can see particularly strong relations with relations that are consistent from model to model. However, some relationships are completely different between each method, such as Electricity (Fossil Fuels) and Global Temperature having three different causal relations: No relation (Time-Lagged), Global Temperature causing Fossil Fuel Electricity (Instantaneous), and Fossil Fuel Electricity causing Global Temperature (Combined). 
+As you can see, there are a lot of causal relations connecting each feature within the earth system. From our results, many of the causal directions make sense from previous knowledge, like Petroleum Production being an important factor in Global Temperature change. We can see particularly strong relations with relations that are consistent from model to model. However, some relationships are completely different between each method, such as Electricity (Fossil Fuels) and Global Temperature having three different causal relations: No relation (Time-Lagged), Global Temperature causing Fossil Fuel Electricity (Instantaneous), and Fossil Fuel Electricity causing Global Temperature (Combined). As shown in the diagram at the top of the page, the earth system is massive, and our models are much simpler than the true system. However, going forward, adding to these types of models will only improve them, with updated, longer data, or with brand new features.
 
 #### For more information:
 Please refer to our research <a href="TEST_REPORT.pdf">report</a>
