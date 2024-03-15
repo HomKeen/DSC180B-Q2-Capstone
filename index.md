@@ -69,7 +69,7 @@ We are using two different models to detect time-lagged (long-term effect) and i
 <center><h4>Heatmap of Granger Causality Importance</h4></center>
 <center><img src="assets/rnn_importance_heatmap.png" frameBorder=2></center>
 The direction of causality is denoted as (row -> column). For example:
-the value of Importance of Petroleum Production for predicting Electricity (Fossil Fuels) is 0.3.
+the value of Importance of Petroleum Production for predicting Electricity (Fossil Fuels) is 0.3. We use an importance value >= 0.1 to support Granger Causality.
 
 ### Instantaneous Causal Relations with CD-NOD Algorithm and Structural Causal Models
 
