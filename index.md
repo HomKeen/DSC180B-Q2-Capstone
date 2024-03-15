@@ -42,21 +42,23 @@ We are using two different models to detect time-lagged (long-term effect) and i
 <details>
   <summary>Time-Delayed Causal Relations with Neural Network Implementations</summary>
   <br>
-  With the assistance of the python package PyTorch, we trained several artificial neural network models on a large portion of the dataset, leaving some recent data as a validation set. This consisted of optimizing the number of layers in our Recurrent Neural Network and the ideal lag value. This model is used to determine Granger causality between variables. We determine causality by systematically leaving out one variable from the training data, training the model, and checking if the error is higher than that of a model trained on the full dataset. We retrain the same model many times to reduce the influence of randomness, and perform a t-test on the resulting errors. Additionally, we will use a NN (trained on the full dataset) to get the residuals when predicting for each variable; these residuals are later used in SCMs.
+  With the assistance of the python package PyTorch, we trained several artificial neural network models on a large portion of the dataset, leaving some recent data as a validation set. This consisted of optimizing the number of layers in our Recurrent Neural Network and the ideal lag value. This model is used to determine Granger causality between variables. We determine causality by including a "filtering" layer at the beginning that uses L1 regularization to discard variables deemed unnecessary to getting a good prediction; this method of discovering Granger causality was first described in [Horvath et al](https://arxiv.org/abs/2208.03703). We retrain the same model many times to reduce the influence of randomness, and averaged the resulting filter values for a more stable outcome. Additionally, we will use the same RNN architecture (trained on the full dataset) to get the residuals when predicting for each variable; these residuals are later used in detecting instantaneous causality with SCMs.
 </details>
 <br>
 
 <details>
   <summary>Instantaneous Causal Relations with CD-NOD Algorithm and Structural Causal Models</summary>
   <br>
-  Using the causallearn python package, the entire dataset was run through a CD-NOD algorithm to find instantaneous causal relations between each variable. This can then be visualized through a node graph. Using the causal links found from the CD-NOD algorithm, an additive noise model (ANM) was applied to each causal link to discover the direction of the link between each node. The ANM returns probabilities of causal direction between each given variable, and thus an threshold of 0.05 will be used to determine enough probable cause for a causal relation. The detection of instantaneous relations is important, since our data has been averaged on a monthly basis. One month is more than enough time for our climate variables to affect one another, but this change would appear to be instantaneous in our data.
+  Using the causallearn python package, the entire dataset was first run through a CD-NOD algorithm to find instantaneous causal relations between each variable. This can then be visualized through a node graph. Using the causal links found from the CD-NOD algorithm, an additive noise model (ANM) was applied to each causal link to discover the direction of the link between each node. The ANM returns probabilities of causal direction between each given variable, and thus an threshold of 0.01 will be used to determine enough probable cause for a causal relation. The detection of instantaneous relations is important, since our data has been averaged on a monthly basis. One month is more than enough time for our climate variables to affect one another, but this change would appear to be instantaneous in our data.
+
+  However, we do not expect these results to be high-quality intuitive. Most of the causal relations will be discovered with time-lagged causality and the combined model.
 </details>
 <br>
 
 <details>
   <summary>Combined Time-Delayed and Instantaneous Causal Relations</summary>
   <br>
-  We are also able to combine NNs and SCMs to create a model that can detect both time-lagged and instantaneous causal relations. First, we fit a NN to the full dataset, which will attempt to predict one time step into the future using a specified number of lags. Then, we find the residuals between the predicted and actual data, and plug this in as input to an SCM. The SCM, in determining causal relations between residuals, will be able to find the instantaneous causal relations that our time-lagged model misses.
+  We are also able to combine RNNs and SCMs to create a model that can detect both time-lagged and instantaneous causal relations. First, we fit a RNN to the full dataset, which will attempt to predict one time step into the future using a specified number of lags. Then, we find the residuals between the predicted and actual data, and plug this in as input to an SCM. The SCM, in determining causal relations between residuals, will be able to find the instantaneous causal relations that our time-lagged model misses.
 </details>
 
 <center><ins><h2>Results</h2></ins></center>
@@ -70,24 +72,26 @@ We are using two different models to detect time-lagged (long-term effect) and i
 <center><h4>Heatmap of Granger Causality Importance</h4></center>
 <center><img src="assets/rnn_importance_heatmap.png" frameBorder=20></center>
 The direction of causality is denoted as (row -> column). For example:
-the value of Importance of Petroleum Production for predicting Electricity (Fossil Fuels) is 0.3. We use an importance value >= 0.1 to support Granger Causality.
+the value of Importance of Petroleum Production for predicting Global Temperature is 0.2. We use an importance value threshold >= 0.1 to support Granger Causality. 
 
 ### Instantaneous Causal Relations with CD-NOD Algorithm and Structural Causal Models
 
 <center><h4>Node-Link Diagram of Causal Relations using CD-NOD Algorithm</h4></center>
 <center><img src="assets/scm_node.png" frameBorder=20></center>
-Using an additive noise model to analyze the direction between Methane and Petroleum Production, we found the causal direction goes both ways: (Methane -> Petroleum Production) & (Petroleum Production -> Methane)
+Using an additive noise model to analyze the direction between Methane and Petroleum Production, we found the causal relations doe not exist. This disagrees with the CD-NOD algorithm. However, we emphasize that a poor result like this is expected.
 
 ### Combined Time-Delayed and Instantaneous Causal Relations
 
 <center><h4>Node-Link Diagram of Causal Relations using CD-NOD Algorithm on NN Residuals</h4></center>
 <center><img src="assets/combined_node.png" frameBorder=20></center>
-Using an additive noise model to analyze the direction between Methane and Petroleum Production, we found the causal direction goes both ways: (Methane -> Petroleum Production) & (Petroleum Production -> Methane)
+Using an additive noise model to analyze the direction between Methane and Petroleum Production, we found the causal direction goes one way: (Petroleum Production -> Methane).
 
-Using an additive noise model to analyze the direction between Electricity (Fossil Fuels) and Electricity (Clean), we found the causal direction goes both ways: (Electricity (Fossil Fuels) -> Electricity (Clean)) & (Electricity (Clean) -> Electricity (Fossil Fuels))
+Using an additive noise model to analyze the direction between Electricity (Fossil Fuels) and Electricity (Clean), we found the causal direction goes one way : (Electricity (Fossil Fuels) -> Electricity (Clean)).
+
+Both of these finding make sense: both electricity variables are highly correlated, and petroleum production (and consumption) indeed causes methane emissions.
 
 ### Findings
-As you can see, there are a lot of causal relations connecting each feature within the earth system. From our results, many of the causal directions make sense from previous knowledge, like Petroleum Production being an important factor in Global Temperature change. We can see particularly strong relations with relations that are consistent from model to model. However, some relationships are completely different between each method, such as Electricity (Fossil Fuels) and Global Temperature having three different causal relations: No relation (Time-Lagged), Global Temperature causing Fossil Fuel Electricity (Instantaneous), and Fossil Fuel Electricity causing Global Temperature (Combined). As shown in the diagram at the top of the page, the earth system is massive, and our models are much simpler than the true system. However, going forward, adding to these types of models will only improve them, with updated, longer data, or with brand new features.
+As you can see, there are a lot of causal relations connecting each feature within the earth system. From our results, most of the causal directions make sense from previous knowledge, like Petroleum Production being an important factor in Global Temperature change. We can see particularly strong relations with relations that are consistent from model to model. However, some relationships are completely different between each method, such as Electricity (Fossil Fuels) and Global Temperature having three different causal relations: No relation (Time-Lagged), Global Temperature causing Fossil Fuel Electricity (Instantaneous), and Fossil Fuel Electricity causing Global Temperature (Combined). As shown in the diagram at the top of the page, the earth system is massive, and our models are much simpler than the true system. However, going forward, adding to these types of models will only improve them, with updated, longer data, or with brand new features.
 
 #### For more information:
 Please refer to our research <a href="TEST_REPORT.pdf">report</a>
@@ -101,6 +105,8 @@ EPA., “Sources of Greenhouse Gas Emissions.” [Link](https://www.epa.gov/ghge
 
 GISTEMP-Team. 2024. “GISS Surface Temperature Analysis (GISTEMP).” NASA Goddard
 Institute for Space Studies. [Link](https://data.giss.nasa.gov/gistemp/)
+
+Horvath, Samuel & Sultan, Malik & Ombao, Hernando. (2022). Granger Causality using Neural Networks.[Link](https://arxiv.org/abs/2208.03703)
 
 Runge, Jakob, Andreas Gerhardus, Gherardo Varando, Veronika Eyring, and Gustau
 Camps-Valls. 2023. “Causal inference for time series.” Nature Reviews Earth & Environ-
