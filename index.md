@@ -46,14 +46,9 @@ In our causal analysis, We will focus specifically on human-related activities t
 <img src="assets/combined_node.png" frameBorder=2>
 ### References
 #### Contact Info
-Keenan Hom: kwhom@ucsd.edu
-<br>
-Dean Carrion: dcarrion@ucsd.edu
-<br>
-Nithilan Muruganandham: nmuruganandham@ucsd.edu
-<br>
-Arnav Khanna: arkhanna@ucsd.edu
-<br>
-Biwei Huang: bih007@ucsd.edu
-<br>
-Babak Salimi: bsalimi@ucsd.edu
+* Keenan Hom: kwhom@ucsd.edu
+* Dean Carrion: dcarrion@ucsd.edu
+* Nithilan Muruganandham: nmuruganandham@ucsd.edu
+* Arnav Khanna: arkhanna@ucsd.edu
+* Biwei Huang: bih007@ucsd.edu
+* Babak Salimi: bsalimi@ucsd.edu
