@@ -35,25 +35,33 @@ In our causal analysis, We will focus specifically on human-related activities t
 <img src="assets/datavis.png" frameBorder=0>
 
 ### Methods
-### Time-Delayed Causal Relations with Neural Network Implementations
+
+We are using two different models to detect time-lagged (long-term effect) and instantaneous (short-term effect) causal relationships in the data. Then, a combined version that uses implementations of both models to detect both instantaneous and time-lagged relationships together.
+
 <details>
-  <summary>How do I dropdown?</summary>
+  <summary>Time-Delayed Causal Relations with Neural Network Implementations</summary>
   <br>
-  This is how you dropdown.
+  With the assistance of the python package PyTorch, we trained several artificial neural network models on a large portion of the dataset, leaving some recent data as a validation set. This consisted of optimizing the number of layers in our Recurrent Neural Network and the ideal lag value. This model is used to determine Granger causality between variables. We determine causality by systematically leaving out one variable from the training data, training the model, and checking if the error is higher than that of a model trained on the full dataset. We retrain the same model many times to reduce the influence of randomness, and perform a t-test on the resulting errors. Additionally, we will use a NN (trained on the full dataset) to get the residuals when predicting for each variable; these residuals are later used in SCMs.
 </details>
 
-### Instantaneous Causal Relations with PC Algorithm and Structural Causal Models
+<details>
+  <summary>Instantaneous Causal Relations with CD-NOD Algorithm and Structural Causal Models</summary>
+  <br>
+  Using the causallearn python package, the entire dataset was run through a CD-NOD algorithm to find instantaneous causal relations between each variable. This can then be visualized through a node graph. Using the causal links found from the CD-NOD algorithm, an additive noise model (ANM) was applied to each causal link to discover the direction of the link between each node. The ANM returns probabilities of causal direction between each given variable, and thus an $\alpha$ of 0.05 will be used to determine enough probable cause for a causal relation. The detection of instantaneous relations is important, since our data has been averaged on a monthly basis. One month is more than enough time for our climate variables to affect one another, but this change would appear to be instantaneous in our data.
+</details>
 
-
-### Combined Time-Delayed and Instantaneous Causal Relations
-
+<details>
+  <summary>Combined Time-Delayed and Instantaneous Causal Relations</summary>
+  <br>
+  We are also able to combine NNs and SCMs to create a model that can detect both time-lagged and instantaneous causal relations. First, we fit a NN to the full dataset, which will attempt to predict one time step into the future using a specified number of lags. Then, we find the residuals between the predicted and actual data, and plug this in as input to an SCM. The SCM, in determining causal relations between residuals, will be able to find the instantaneous causal relations that our time-lagged model misses.
+</details>
 
 ### Results
 ### Time-Delayed Causal Relations with Neural Network Implementations
 <img src="assets/rnn_predictions.png" frameBorder=2>
 <img src="assets/rnn_importance_heatmap.png" frameBorder=2>
 
-### Instantaneous Causal Relations with PC Algorithm and Structural Causal Models
+### Instantaneous Causal Relations with CD-NOD Algorithm and Structural Causal Models
 <img src="assets/scm_node.png" frameBorder=2>
 
 ### Combined Time-Delayed and Instantaneous Causal Relations
