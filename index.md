@@ -13,10 +13,24 @@ As mentioned in [this article by Song and Ma](https://www.mdpi.com/2571-905X/6/2
 
 In our causal analysis, We will focus specifically on human-related activities that are well-known to be causes of climate change. This includes measures of global warming, greenhouse gas emissions, energy production, and petroleum production. We will use two methods to perform causal inference, Neural Network models and Structural Causal Model Frameworks (SCMs). We chose Neural Network models based on their success when working with time series data and their ability to detect highly nonlinear relationships, which we expect to find in our data. SCMs are a dedicated causal framework that seek to represent variables as nodes in a directed graph. An edge from node *x* to node *y* means that *x* has been determined to cause *y*. SCMs have scarcely been applied in the field of climate change research, so this project will also serve to analyze their effectiveness within the Earth system.
 
-### Data Sources
-* Global Temperature: Goddard Institute for Space Studies (GISS) / NASA
-* CO2 & Methane (CH4): Global Monitoring Division of the National Oceanic and Atmospheric Administration (NOAA)
-* Electricity Generation (Fossil Fuels/Clean) & Petroleum Production: Energy Information Administration (EIA)
+### Data
+<details>
+  <summary>Global Temperature: Goddard Institute for Space Studies (GISS) / NASA</summary>
+  <br>
+  https://data.giss.nasa.gov/gistemp/
+</details>
+<details>
+  <summary>CO2 & Methane (CH4): Global Monitoring Division of the National Oceanic and Atmospheric Administration (NOAA)</summary>
+  <br>
+  * https://gml.noaa.gov/ccgg/trends/gl_data.html
+  * https://gml.noaa.gov/ccgg/trends_ch4/
+</details>
+<details>
+  <summary>Electricity Generation (Fossil Fuels/Clean) & Petroleum Production: Energy Information Administration (EIA)</summary>
+  <br>
+  * https://www.eia.gov/totalenergy/data/monthly/
+  * https://www.eia.gov/international/data/world
+</details>
 
 <img src="assets/datavis.png" frameBorder=0>
 
@@ -45,7 +59,7 @@ In our causal analysis, We will focus specifically on human-related activities t
 ### Combined Time-Delayed and Instantaneous Causal Relations
 <img src="assets/combined_node.png" frameBorder=2>
 
-<button name="button" onclick="http://www.google.com">Click me</button>
+<button onclick="window.location.href='https://bing.com';">Click</button>
 
 ### References
 #### Contact Info
