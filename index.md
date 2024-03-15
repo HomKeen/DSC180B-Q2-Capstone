@@ -33,7 +33,7 @@ In our causal analysis, We will focus specifically on human-related activities t
   * https://www.eia.gov/international/data/world
 </details>
 
-<img src="assets/datavis.png" frameBorder=0>
+<img src="assets/datavis.png" frameBorder=20>
 
 ### Methods
 
@@ -65,23 +65,23 @@ We are using two different models to detect time-lagged (long-term effect) and i
 ### Time-Delayed Causal Relations with Neural Network Implementations
 
 <center><h4>Prediction Performance of the Neural Network model for each Feature</h4></center>
-<center><img src="assets/rnn_predictions.png" frameBorder=2></center>
+<center><img src="assets/rnn_predictions.png" frameBorder=20></center>
 
 <center><h4>Heatmap of Granger Causality Importance</h4></center>
-<center><img src="assets/rnn_importance_heatmap.png" frameBorder=2></center>
+<center><img src="assets/rnn_importance_heatmap.png" frameBorder=20></center>
 The direction of causality is denoted as (row -> column). For example:
 the value of Importance of Petroleum Production for predicting Electricity (Fossil Fuels) is 0.3. We use an importance value >= 0.1 to support Granger Causality.
 
 ### Instantaneous Causal Relations with CD-NOD Algorithm and Structural Causal Models
 
 <center><h4>Node-Link Diagram of Causal Relations using CD-NOD Algorithm</h4></center>
-<center><img src="assets/scm_node.png" frameBorder=2></center>
+<center><img src="assets/scm_node.png" frameBorder=20></center>
 Using an additive noise model to analyze the direction between Methane and Petroleum Production, we found the causal direction goes both ways: (Methane -> Petroleum Production) & (Petroleum Production -> Methane)
 
 ### Combined Time-Delayed and Instantaneous Causal Relations
 
 <center><h4>Node-Link Diagram of Causal Relations using CD-NOD Algorithm on NN Residuals</h4></center>
-<center><img src="assets/combined_node.png" frameBorder=2></center>
+<center><img src="assets/combined_node.png" frameBorder=20></center>
 Using an additive noise model to analyze the direction between Methane and Petroleum Production, we found the causal direction goes both ways: (Methane -> Petroleum Production) & (Petroleum Production -> Methane)
 
 Using an additive noise model to analyze the direction between Electricity (Fossil Fuels) and Electricity (Clean), we found the causal direction goes both ways: (Electricity (Fossil Fuels) -> Electricity (Clean)) & (Electricity (Clean) -> Electricity (Fossil Fuels))
@@ -94,6 +94,7 @@ Please refer to our research <a href="TEST_REPORT.pdf">report</a>
 
 
 #### References
+Education, UCAR Center for Science. “Center for Science Education.” The Climate System | Center for Science Education, [Link](scied.ucar.edu/learning-zone/earth-system/climate-system)
 (EIA), U.S. Energy Information Administration’s., “The Monthly Energy Review.” [Link](https://www.eia.gov/totalenergy/data/monthly/)
 
 EPA., “Sources of Greenhouse Gas Emissions.” [Link](https://www.epa.gov/ghgemissions/sources-greenhouse-gas-emissions#:~:text=Carbon%20dioxide%20(CO2)%20makes,natural%20gas%2C%20to%20produce%20electricity.)
