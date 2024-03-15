@@ -61,6 +61,10 @@ In our causal analysis, We will focus specifically on human-related activities t
 
 <button onclick="window.location.href='https://bing.com';">Click</button>
 
+#### For more information:
+Please refer to our research report
+<a href="report.pdf(depends on your filepath and filename)">report</a>
+
 ### References
 (EIA), U.S. Energy Information Administration’s., “The Monthly Energy Review.” [Link](https://www.eia.gov/totalenergy/data/monthly/)
 
