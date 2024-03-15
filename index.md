@@ -66,23 +66,23 @@ We are using two different models to detect time-lagged (long-term effect) and i
 ### Time-Delayed Causal Relations with Neural Network Implementations
 
 <center><h4>Prediction Performance of the Neural Network model for each Feature</h4></center>
-<img src="assets/rnn_predictions.png" frameBorder=2>
+<center><img src="assets/rnn_predictions.png" frameBorder=2></center>
 
 <center><h4>Heatmap of Granger Causality Importance</h4></center>
-<img src="assets/rnn_importance_heatmap.png" frameBorder=2>
+<center><img src="assets/rnn_importance_heatmap.png" frameBorder=2></center>
 The direction of causality is denoted as (row -> column). For example:
 the value of Importance of Petroleum Production for predicting Electricity (Fossil Fuels) is 0.3.
 
 ### Instantaneous Causal Relations with CD-NOD Algorithm and Structural Causal Models
 
 <center><h4>Node-Link Diagram of Causal Relations using CD-NOD Algorithm</h4></center>
-<img src="assets/scm_node.png" frameBorder=2>
+<center><img src="assets/scm_node.png" frameBorder=2></center>
 Using an additive noise model to analyze the direction between Methane and Petroleum Production, we found the causal direction goes both ways: (Methane -> Petroleum Production) & (Petroleum Production -> Methane)
 
 ### Combined Time-Delayed and Instantaneous Causal Relations
 
 <center><h4>Node-Link Diagram of Causal Relations using CD-NOD Algorithm on NN Residuals</h4></center>
-<img src="assets/combined_node.png" frameBorder=2>
+<center><img src="assets/combined_node.png" frameBorder=2></center>
 Using an additive noise model to analyze the direction between Methane and Petroleum Production, we found the causal direction goes both ways: (Methane -> Petroleum Production) & (Petroleum Production -> Methane)
 
 Using an additive noise model to analyze the direction between Electricity (Fossil Fuels) and Electricity (Clean), we found the causal direction goes both ways: (Electricity (Fossil Fuels) -> Electricity (Clean)) & (Electricity (Clean) -> Electricity (Fossil Fuels))
