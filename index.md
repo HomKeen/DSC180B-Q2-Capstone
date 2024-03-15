@@ -94,7 +94,7 @@ Both of these finding make sense: both electricity variables are highly correlat
 As you can see, there are a lot of causal relations connecting each feature within the earth system. From our results, most of the causal directions make sense from previous knowledge, like Petroleum Production being an important factor in Global Temperature change. We can see particularly strong relations with relations that are consistent from model to model. However, some relationships are completely different between each method, such as Electricity (Fossil Fuels) and Global Temperature having three different causal relations: No relation (Time-Lagged), Global Temperature causing Fossil Fuel Electricity (Instantaneous), and Fossil Fuel Electricity causing Global Temperature (Combined). As shown in the diagram at the top of the page, the earth system is massive, and our models are much simpler than the true system. However, going forward, adding to these types of models will only improve them, with updated, longer data, or with brand new features.
 
 #### For more information:
-Please refer to our research <a href="TEST_REPORT.pdf">report</a>
+Please refer to our research <a href="A11_3_Capstone_Report.pdf">report</a>
 
 
 #### References
